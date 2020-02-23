@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "761206714235",
+    "firebase_url": "https://encontraste-543c2.firebaseio.com",
+    "project_id": "encontraste-543c2",
+    "storage_bucket": "encontraste-543c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761206714235:android:d55eb2e27a7722829f17de",
+        "android_client_info": {
+          "package_name": "com.bitstudio.encontraste"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "761206714235-44b22ibbh1aoq0ulo1hrkkupfi2qcmj7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmKpBoDbe_kqZZ64j9exy2TK2DEIHK968"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "761206714235-44b22ibbh1aoq0ulo1hrkkupfi2qcmj7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
