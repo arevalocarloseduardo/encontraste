@@ -6,8 +6,8 @@ import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-class PrincipalHomeController with ChangeNotifier {
-  PrincipalHomeController() {
+class JuegoController with ChangeNotifier {
+  JuegoController() {
     print("inicio provider");
     init();
   }

@@ -2,6 +2,7 @@ import 'package:encontraste/utils/locator.dart';
 import 'package:encontraste/views/screens/app_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'controllers/juego_controller.dart';
 import 'controllers/principal_home_controller.dart';
 import 'controllers/screen_controller.dart';
 import 'utils/crud.dart';
@@ -21,6 +22,8 @@ class Encontraste extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => locator<CRUDModel>()),
           ChangeNotifierProvider(create: (_) => ScreenController()),
           ChangeNotifierProvider(create: (_) => PrincipalHomeController()),
+          ChangeNotifierProvider(create: (_) => JuegoController()),
+          
         ],
         child: MaterialApp(
           localizationsDelegates: [

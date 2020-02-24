@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encontraste/models/equipo.dart';
 import 'package:encontraste/models/persona.dart';
+import 'package:encontraste/models/punto.dart';
+import 'package:encontraste/models/utils.dart';
 import 'package:encontraste/utils/constants.dart';
 
 class DatabaseService {
@@ -79,9 +81,82 @@ class DatabaseService {
     return false;
   }
 
-  Stream<List<Persona>> streamListPersonas() {
-    var ref = _db.collection(Constanst.DB_PERSONAS);
+  Stream<List<Persona>> streamListPersonas({String idEquipo}) {
+    var ref = _db
+        .collection(Constanst.DB_PERSONAS)
+        .where(Constanst.ID_EQUIPO, isEqualTo: idEquipo);
     return ref.snapshots().map((list) =>
         list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
+  }
+
+  Stream<List<Utils>> streamVer() {
+    var ref = _db
+        .collection("utils");
+    return ref.snapshots().map((list) =>
+        list.documents.map((doc) => Utils.fromFirestore(doc)).toList());
+  }
+
+  bool createPuntos(Punto punto) {
+    _db.collection(Constanst.PUNTOS).document().setData({
+      Constanst.FECHA: punto.fecha,
+      Constanst.ID_EQUIPO: punto.idEquipo,
+      Constanst.MOTIVO: punto.motivo,
+      Constanst.PUNTOS: punto.puntos
+    }).then((value) {
+      return true;
+    });
+    return false;
+  }
+
+  Future<bool> updateEquipo(Equipo equipo) async {
+    await _db.collection(Constanst.DB_EQUIPOS).document(equipo.id).updateData({
+      Constanst.COLOR: equipo.nombre,
+      Constanst.ID_EQUIPO: equipo.id,
+      Constanst.NOMBRE_EQUIPO: equipo.nombre,
+      Constanst.PUNTOS: equipo.puntos,
+    }).then((value) {
+      return true;
+    });
+    return false;
+  }
+
+  Future<bool> juegoUser(String user) async {
+    if (user == "celeste") {
+      await _db
+          .collection("utils")
+          .document("GGRiMDcXMFc9jYl2fX4S")
+          .updateData({
+        "id_apreto": user,
+        "apreto_2": true,
+      }).then((value) {
+        return true;
+      });
+      return false;
+    } else {
+      await _db
+          .collection("utils")
+          .document("GGRiMDcXMFc9jYl2fX4S")
+          .updateData({
+        "id_apreto": user,
+        "apreto_1": true,
+      }).then((value) {
+        return true;
+      });
+      return false;
+    }
+  } Future<bool> juegoUserClean(String user) async {
+    
+      await _db
+          .collection("utils")
+          .document("GGRiMDcXMFc9jYl2fX4S")
+          .updateData({
+        "id_apreto": "default",
+        "apreto_1": false,
+        "apreto_2": false,
+      }).then((value) {
+        return true;
+      });
+      return false;
+    
   }
 }

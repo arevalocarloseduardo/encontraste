@@ -6,7 +6,7 @@ class AppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenController = Provider.of<ScreenController>(context);
-    return Scaffold(
+    return MediaQuery.of(context).orientation == Orientation.portrait?Scaffold(
       bottomNavigationBar: screenController.botomBarPrincipal
           ? BottomNavigationBar(
               currentIndex: screenController
@@ -17,17 +17,19 @@ class AppScreen extends StatelessWidget {
                   title: new Text('Home'),
                 ),
                 BottomNavigationBarItem(
-                  icon: new Icon(Icons.person),
-                  title: new Text('Equipos'),
+                  icon: new Icon(Icons.tv),
+                  title: new Text('ver'),
                 ),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.show_chart), title: Text('Configuración'))
+                    icon: Icon(Icons.games), title: Text('juego'))
               ],
               onTap: (val) {
                 screenController.currentIndexBottom = val;
               },
             )
           : null,
+      body: screenController.screen,
+    ):Scaffold(
       body: screenController.screen,
     );
   }

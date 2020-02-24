@@ -14,9 +14,14 @@ class Equipo {
 
   Equipo({this.id, this.nombre, this.personas, this.puntos, this.color});
   factory Equipo.fromMap(Map data) {
-    var color = data[Constanst.COLOR] ?? "celeste";
-    var materialColor = color == "rojo" ? Colors.red : Colors.lightBlue;
-    return Equipo(puntos: 212,personas: [],
+    print(data);
+    var color = data[Constanst.COLOR] ?? "Celeste";
+    var materialColor = color == "Celeste"
+        ? Colors.lightBlue
+        : color == "Naranja" ? Colors.orange : Colors.lightBlue;
+    return Equipo(
+      puntos: data[Constanst.PUNTOS]??0,
+      personas: [],
       id: data[Constanst.ID_EQUIPO] ?? "",
       nombre: data[Constanst.NOMBRE_EQUIPO] ?? "",
       color: materialColor,
@@ -24,11 +29,14 @@ class Equipo {
   }
   factory Equipo.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
-
-    var color = data[Constanst.COLOR] ?? "celeste";
-    var materialColor = color == "rojo" ? Colors.red : Colors.lightBlue;
+    var color = data[Constanst.COLOR] ?? "Celeste";
+    var materialColor = color == "Celeste"
+        ? Colors.lightBlue
+        : color == "Naranja" ? Colors.orange : Colors.lightBlue;
     return Equipo(
-      id: doc.documentID ?? "",puntos: 212,personas: [],
+      id: doc.documentID ?? "",
+      puntos: data[Constanst.PUNTOS] ?? 0,
+      personas: [],
       nombre: data[Constanst.NOMBRE_EQUIPO] ?? "",
       color: materialColor,
     );

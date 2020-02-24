@@ -1,6 +1,9 @@
 import 'package:encontraste/controllers/principal_home_controller.dart';
 import 'package:encontraste/controllers/screen_controller.dart';
+import 'package:encontraste/models/equipo.dart';
+import 'package:encontraste/models/juego.dart';
 import 'package:encontraste/models/persona.dart';
+import 'package:encontraste/models/punto.dart';
 import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
 import 'package:encontraste/utils/crud.dart';
@@ -42,7 +45,8 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
         ),
         body: Container(
             child: StreamBuilder<List<Persona>>(
-          stream: db.streamListPersonas(),
+          stream: db.streamListPersonas(
+              idEquipo: principalHomeController.equipo.id ?? ""),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               personas = snapshot.data;
@@ -68,18 +72,34 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
     var percentWidth = width / principalHomeController.reunion.equipos.length;
     for (var i = 0; i < principalHomeController.reunion.equipos.length; i++) {
       cards.add(GestureDetector(
-        onLongPress: () {},
-        onTap: () {
-        /*  setState(() {
+        onLongPress: () {
+          setState(() {
             principalHomeController
                 .selectEquipo(principalHomeController.reunion.equipos[i]);
-            for (var a = 0; a < principalHomeController.equipos.length; a++) {
+            for (var a = 0;
+                a < principalHomeController.reunion.equipos.length;
+                a++) {
               principalHomeController.select[a] = false;
               if (i == a) {
                 principalHomeController.select[i] = true;
               }
             }
-          });*/
+          });
+          showPuntos(context);
+        },
+        onTap: () {
+          setState(() {
+            principalHomeController
+                .selectEquipo(principalHomeController.reunion.equipos[i]);
+            for (var a = 0;
+                a < principalHomeController.reunion.equipos.length;
+                a++) {
+              principalHomeController.select[a] = false;
+              if (i == a) {
+                principalHomeController.select[i] = true;
+              }
+            }
+          });
         },
         child: Container(
           height: percentWidth / 1.5,
@@ -89,8 +109,10 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15)),
               gradient: LinearGradient(colors: [
-                principalHomeController.reunion.equipos[i].color.withOpacity(0.6),
-                principalHomeController.reunion.equipos[i].color.withOpacity(0.9)
+                principalHomeController.reunion.equipos[i].color
+                    .withOpacity(0.6),
+                principalHomeController.reunion.equipos[i].color
+                    .withOpacity(0.9)
               ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
             ),
             child: Column(
@@ -105,14 +127,13 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                   style: TextStyle(
                       color: Colors.white, fontSize: percentWidth * 0.14),
                 ),
-                //principalHomeController.select[i]
-                    //? 
-                    Container(
+                principalHomeController.select[i]
+                    ? Container(
                         color: Colors.white,
                         height: 2,
                         width: percentWidth / 2,
                       )
-                  //  : Container()
+                    : Container()
               ],
             ),
           ),
@@ -140,8 +161,14 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
       listTile.add(Column(
         children: <Widget>[
           ListTile(
+            trailing: GestureDetector(
+                onTap: () {
+                  showUpdate(context, personas[i]);
+                },
+                child: Icon(Icons.view_headline)),
             onTap: () {
-              showUpdate(context, personas[i]);
+              showPuntos(context);
+              // showUpdate(context, personas[i]);
               //db.deletePersona(Persona(id:id));
             },
             //onTap: () {db.createPersona(Persona(nombres: "Carlos Eduardo",apellidos: "Arevalo",));},
@@ -182,6 +209,95 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
         children: listTile,
       ),
     );
+  }
+
+  void showPuntos(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          var time = DateTime(1995);
+          var persona = principalHomeController.persona;
+          var hombre = true;
+          var motivo;
+          int puntos;
+
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Puntos para el ${principalHomeController.equipo.nombre}",
+                          style: TextStyle(color: Colors.green, fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ),
+                        TextField(
+                          style: TextStyle(color: Colors.black54),
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Puntos",
+                          ),
+                          onChanged: (val) {
+                            setState(() {
+                              puntos = int.parse(val);
+                            });
+                          },
+                        ),
+                        TextField(
+                          style: TextStyle(color: Colors.black54),
+                          decoration: InputDecoration(
+                            labelText: "Motivo:",
+                          ),
+                          onChanged: (val) {
+                            setState(() {
+                              motivo = val;
+                            });
+                          },
+                        ),
+                        SizedBox(
+                          width: 320.0,
+                          child: RaisedButton(
+                            onPressed: () {
+                              var punto = Punto(
+                                  idEquipo: principalHomeController.equipo.id,
+                                  puntos: puntos,
+                                  fecha: DateTime.now(),
+                                  motivo: motivo ?? "");
+                              var equipo = Equipo(
+                                id: principalHomeController.equipo.id,
+                                nombre: principalHomeController.equipo.nombre,
+                                color: principalHomeController.equipo.color,
+                                puntos: principalHomeController.equipo.puntos +
+                                    puntos,
+                              );
+                              db.createPuntos(punto);
+                              db.updateEquipo(equipo);
+
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "agregar",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Color(0xFF1BC0C5),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        });
   }
 
   void showAgregar(BuildContext context) {
@@ -289,6 +405,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                           child: RaisedButton(
                             onPressed: () {
                               persona = Persona(
+                                  idEquipo: principalHomeController.equipo.id,
                                   apellidos: apellidos,
                                   nombres: nombres,
                                   fechaDeNacimiento: time,
@@ -321,8 +438,8 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
         builder: (BuildContext context) {
           var time = persona.fechaDeNacimiento;
           var hombre = persona.sexo == "M" ? true : false;
-          var apellidos=persona.apellidos;
-          var nombres=persona.nombres;
+          var apellidos = persona.apellidos;
+          var nombres = persona.nombres;
 
           return StatefulBuilder(
             builder: (BuildContext context, setState) {
@@ -430,12 +547,13 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              "Crear",
+                              "Actualizar",
                               style: TextStyle(color: Colors.white),
                             ),
                             color: Color(0xFF1BC0C5),
                           ),
-                        ),SizedBox(
+                        ),
+                        SizedBox(
                           width: 320.0,
                           child: FlatButton(
                             onPressed: () {

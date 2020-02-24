@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 class Constanst{
 
+
   Constanst._();
 
 
 
+  static const MOTIVO="motivo";
+  static const PUNTOS="puntos";
   static const DB_PERSONAS="personas";
   static const DB_EQUIPOS="equipos";
   static const NOMBRES="nombres";
@@ -13,6 +16,7 @@ class Constanst{
   static const ID_PERSONA = "id";
   static const APELLIDOS="apellidos";
   static const FECHA_NACIMIENTO = "fecha_nacimiento";
+  static const FECHA = "fecha";
   static const SEXO="sexo";
   static const COLOR="color";
   static const ID_EQUIPO = "id_equipo";

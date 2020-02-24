@@ -1,5 +1,8 @@
+
+import 'package:encontraste/views/screens/juego_screen.dart';
 import 'package:encontraste/views/screens/principal_home_screen.dart';
 import 'package:encontraste/views/screens/splash_screen.dart';
+import 'package:encontraste/views/screens/ver_screen.dart';
 import 'package:flutter/material.dart';
 
 class ScreenController with ChangeNotifier {
@@ -42,10 +45,10 @@ class ScreenController with ChangeNotifier {
         goto(screen: PrincipalHomeScreen());
         break;
       case 1:
-        goto(screen: SplashScreen());
+        goto(screen: VerScreen());
         break;
       case 2:
-        goto(screen: PrincipalHomeScreen());
+        goto(screen: JuegoScreen());
         break;
       default:
     }
