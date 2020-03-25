@@ -1,14 +1,18 @@
 import 'package:encontraste/controllers/screen_controller.dart';
 import 'package:encontraste/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+ 
   @override
   Widget build(BuildContext context) {
-  ScreenController screenController;
-    screenController = Provider.of<ScreenController>(context);
-    screenController.nextScreen();
+  //ScreenController screenController = Provider.of<ScreenController>(context);
+    //screenController.nextScreen();
     return Scaffold(
       backgroundColor: BereaColors.purple,
       body: Center(

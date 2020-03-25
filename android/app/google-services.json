@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "761206714235-s0bohsdiucjm5ru7jugu8po95fg7s44e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bitstudio.encontraste",
+            "certificate_hash": "6e9d95ab6f63ba4d31ba787a0ffe507438a8add0"
+          }
+        },
+        {
           "client_id": "761206714235-44b22ibbh1aoq0ulo1hrkkupfi2qcmj7.apps.googleusercontent.com",
           "client_type": 3
         }

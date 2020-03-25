@@ -1,3 +1,4 @@
+import 'package:encontraste/controllers/auth_controller.dart';
 import 'package:encontraste/controllers/principal_home_controller.dart';
 import 'package:encontraste/controllers/screen_controller.dart';
 import 'package:encontraste/models/equipo.dart';
@@ -23,24 +24,28 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
   PrincipalHomeController principalHomeController;
   final db = DatabaseService();
   List<Persona> personas;
+  AuthController authUser;
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     principalHomeController = Provider.of<PrincipalHomeController>(context);
+    authUser = Provider.of<AuthController>(context);
 
-    final productProvider = Provider.of<CRUDModel>(context);
-    List<Persona> docs = [];
-    var screenController = Provider.of<ScreenController>(context);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: BereaColors.purple,
-          title: Container(
-            child: Image.asset(
-              "assets/logoen.png",
+          title: GestureDetector(
+            onTap: () {
+              authUser.signOut();
+            },
+            child: Container(
+              child: Image.asset(
+                "assets/logoen.png",
+              ),
+              height: width * 0.2,
+              width: width,
             ),
-            height: width * 0.2,
-            width: width,
           ),
         ),
         body: Container(
@@ -85,7 +90,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
               }
             }
           });
-          showPuntos(context);
+          showPuntos(context, Persona(id: "admin"));
         },
         onTap: () {
           setState(() {
@@ -156,18 +161,28 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
       var nombre = personas[i]
           .nombres; // principalHomeController.equipo.personas[i].nombres[0];
       var apellido = personas[i].apellidos;
+      var sexo = personas[i].sexo;
       var id = personas[i].id;
 
       listTile.add(Column(
         children: <Widget>[
           ListTile(
+            leading: Column(
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundColor: sexo == "M" ? BereaColors.m : BereaColors.f,
+                  child: Text(
+                      "${nombre[0]}.${apellido == null || apellido.isEmpty ? '' : apellido[0]}"),
+                ),
+              ],
+            ),
             trailing: GestureDetector(
                 onTap: () {
                   showUpdate(context, personas[i]);
                 },
                 child: Icon(Icons.view_headline)),
             onTap: () {
-              showPuntos(context);
+              showPuntos(context, personas[i]);
               // showUpdate(context, personas[i]);
               //db.deletePersona(Persona(id:id));
             },
@@ -211,12 +226,11 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
     );
   }
 
-  void showPuntos(BuildContext context) {
+  void showPuntos(BuildContext context, Persona persona) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           var time = DateTime(1995);
-          var persona = principalHomeController.persona;
           var hombre = true;
           var motivo;
           int puntos;
@@ -239,6 +253,46 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                           style: TextStyle(color: Colors.green, fontSize: 18),
                           textAlign: TextAlign.center,
                         ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {},
+                                child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.import_contacts)),
+                              ),
+                              GestureDetector(
+                                onTap: () {},
+                                child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.description)),
+                              ),
+                              GestureDetector(
+                                onTap: () {},
+                                child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.group_add)),
+                              ),
+                              GestureDetector(
+                                onTap: () {},
+                                child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.account_balance)),
+                              ),
+                              GestureDetector(
+                                onTap: () {},
+                                child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.timer)),
+                              ),
+                            ]),
                         TextField(
                           style: TextStyle(color: Colors.black54),
                           keyboardType: TextInputType.number,
@@ -270,6 +324,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                                   idEquipo: principalHomeController.equipo.id,
                                   puntos: puntos,
                                   fecha: DateTime.now(),
+                                  idPersona: persona.id,
                                   motivo: motivo ?? "");
                               var equipo = Equipo(
                                 id: principalHomeController.equipo.id,
@@ -284,7 +339,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              "agregar",
+                              "Agregar",
                               style: TextStyle(color: Colors.white),
                             ),
                             color: Color(0xFF1BC0C5),

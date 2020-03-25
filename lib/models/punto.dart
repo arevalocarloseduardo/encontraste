@@ -3,6 +3,7 @@ import 'package:encontraste/utils/constants.dart';
 
 class Punto {
   String idEquipo;
+  String idPersona;
   int puntos;
   String motivo;
   DateTime fecha;
@@ -11,11 +12,13 @@ class Punto {
     this.puntos,
     this.motivo,
     this.idEquipo,
+    this.idPersona,
     this.fecha,
   });
   factory Punto.fromMap(Map data) {
     return Punto(
       idEquipo: data[Constanst.ID_EQUIPO] ?? "",
+      idPersona: data[Constanst.ID_PERSONA] ?? "",
       puntos: data[Constanst.PUNTOS] ?? 0,
       motivo: data[Constanst.MOTIVO] ?? "",
       fecha: DateTime.fromMicrosecondsSinceEpoch(data[Constanst.FECHA] == null
@@ -26,7 +29,8 @@ class Punto {
   factory Punto.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
     return Punto(
-      idEquipo: data[Constanst.ID_EQUIPO] ?? "",
+      idEquipo: data[Constanst.ID_EQUIPO] ?? "",      
+      idPersona: data[Constanst.ID_PERSONA] ?? "",
       puntos: data[Constanst.PUNTOS] ?? 0,
       motivo: data[Constanst.MOTIVO] ?? "",
       fecha: DateTime.fromMicrosecondsSinceEpoch(data[Constanst.FECHA] == null

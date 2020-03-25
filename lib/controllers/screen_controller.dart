@@ -1,13 +1,43 @@
-
+import 'package:encontraste/controllers/auth_controller.dart';
 import 'package:encontraste/views/screens/juego_screen.dart';
+import 'package:encontraste/views/screens/login.dart';
 import 'package:encontraste/views/screens/principal_home_screen.dart';
 import 'package:encontraste/views/screens/splash_screen.dart';
 import 'package:encontraste/views/screens/ver_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ScreenController with ChangeNotifier {
+  ScreenController() {
+    AuthController.shared.statusUserChanged.listen(_onAuthStateChanged);
+  }
   Widget _screen = SplashScreen();
+
   Widget get screen => _screen;
+  set screen(Widget value) {
+    _screen = value;
+    notifyListeners();
+  }
+
+  _onAuthStateChanged(Status userStatus) {
+    switch (userStatus) {
+      case Status.Uninitialized:
+        screen = SplashScreen();
+        break;
+      case Status.Unauthenticated:
+        screen = LoginScreen();
+        break;
+      case Status.Authenticating:
+        screen = LoginScreen();
+        break;
+      case Status.Authenticated:
+        screen = PrincipalHomeScreen();
+        break;
+      default:
+        screen = SplashScreen();
+    }
+  }
 
   bool _botomBarPrincipal = false;
   bool get botomBarPrincipal => _botomBarPrincipal;

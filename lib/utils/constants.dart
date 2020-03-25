@@ -26,4 +26,14 @@ class BereaColors {
   BereaColors._();
 
   static const Color purple = Color(0x1ff171b37);
+
+  static const Color f = Colors.pinkAccent;
+
+  static const Color m = Colors.cyan;
+}
+class BereaStyles {
+  BereaStyles._();
+
+  static const TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+ 
 }

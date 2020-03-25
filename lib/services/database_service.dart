@@ -81,17 +81,35 @@ class DatabaseService {
     return false;
   }
 
-  Stream<List<Persona>> streamListPersonas({String idEquipo}) {
-    var ref = _db
-        .collection(Constanst.DB_PERSONAS)
-        .where(Constanst.ID_EQUIPO, isEqualTo: idEquipo);
-    return ref.snapshots().map((list) =>
-        list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
+  Stream<List<Persona>> streamListPersonas({String idEquipo, String nombre,}) {
+    CollectionReference ref = _db.collection(Constanst.DB_PERSONAS);
+    Query query;
+
+    if (idEquipo != null) {
+      query = ref
+          .where(Constanst.ID_EQUIPO, isEqualTo: idEquipo);
+      return query.snapshots().map((list) =>
+          list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
+    } else {
+      
+     
+
+      return ref.snapshots().map((list) =>
+          list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
+    }
+  }
+  Stream<List<Punto>> streamListPuntos() {
+    CollectionReference ref = _db.collection(Constanst.PUNTOS);
+    Query query;
+
+      query = ref;
+      return query.snapshots().map((list) =>
+          list.documents.map((doc) => Punto.fromFirestore(doc)).toList());
+   
   }
 
   Stream<List<Utils>> streamVer() {
-    var ref = _db
-        .collection("utils");
+    var ref = _db.collection("utils");
     return ref.snapshots().map((list) =>
         list.documents.map((doc) => Utils.fromFirestore(doc)).toList());
   }
@@ -101,7 +119,8 @@ class DatabaseService {
       Constanst.FECHA: punto.fecha,
       Constanst.ID_EQUIPO: punto.idEquipo,
       Constanst.MOTIVO: punto.motivo,
-      Constanst.PUNTOS: punto.puntos
+      Constanst.PUNTOS: punto.puntos,
+      Constanst.ID_PERSONA: punto.idPersona
     }).then((value) {
       return true;
     });
@@ -144,19 +163,16 @@ class DatabaseService {
       });
       return false;
     }
-  } Future<bool> juegoUserClean(String user) async {
-    
-      await _db
-          .collection("utils")
-          .document("GGRiMDcXMFc9jYl2fX4S")
-          .updateData({
-        "id_apreto": "default",
-        "apreto_1": false,
-        "apreto_2": false,
-      }).then((value) {
-        return true;
-      });
-      return false;
-    
+  }
+
+  Future<bool> juegoUserClean(String user) async {
+    await _db.collection("utils").document("GGRiMDcXMFc9jYl2fX4S").updateData({
+      "id_apreto": "default",
+      "apreto_1": false,
+      "apreto_2": false,
+    }).then((value) {
+      return true;
+    });
+    return false;
   }
 }

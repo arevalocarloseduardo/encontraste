@@ -1,4 +1,5 @@
 import 'package:encontraste/services/database_service.dart';
+import 'package:encontraste/views/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class JuegoScreen extends StatefulWidget {
@@ -7,30 +8,90 @@ class JuegoScreen extends StatefulWidget {
 }
 
 class _JuegoScreenState extends State<JuegoScreen> {
-  var user="celeste";
-  
+  var user = "naranja";
+
   final db = DatabaseService();
   @override
   Widget build(BuildContext context) {
-    
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: RawMaterialButton(
-          onPressed: () {
-             db.juegoUser(user);
-          },
-          child: new Icon(
-            Icons.close,
-            color: Colors.white,
-            size: 160.0,
-          ),
-          shape: new CircleBorder(),
-          elevation: 4.0,
-          fillColor: Colors.red,
-          padding: const EdgeInsets.all(15.0),
+    return Stack(
+      children: <Widget>[
+        Container(
+          color: Colors.red,
+          height: 800,
+          width: 400,
         ),
-      ),
+        Center(
+          child: Container(
+            child: new Center(
+              child: new Container(
+                decoration: new BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.red,
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      spreadRadius: -10.0,
+                      color: Colors.black87,
+                      offset: Offset(7.0, -2.0),
+                      blurRadius: 10.0,
+                    ),
+                    BoxShadow(
+                      spreadRadius: -10.0,
+                      color: Colors.white70,
+                      offset: Offset(-2.0, 5.0),
+                      blurRadius: 10.0,
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.all(16.0),
+              ),
+            ),
+            width: 220.0,
+            height: 230.0,
+            margin: EdgeInsets.only(bottom: 16.0),
+          ),
+        ),
+        Center(
+          child: Container(
+            child: new Container(
+              child: Center(
+                child: Text(
+                  "Aceptar",
+                  style: TextStyle(color: Colors.white70, fontSize: 30),
+                ),
+              ),
+              decoration: new BoxDecoration(
+                borderRadius: BorderRadius.circular(60),
+                color: Colors.red,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    spreadRadius: -10.0,
+                    color: Colors.black87,
+                    offset: Offset(-5.0, 5.0),
+                    blurRadius: 10.0,
+                  ),
+                  BoxShadow(
+                    spreadRadius: -10.0,
+                    color: Colors.white70,
+                    offset: Offset(5.0, -5.0),
+                    blurRadius: 10.0,
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(16.0),
+            ),
+            width: 320.0,
+            height: 100.0,
+            margin: EdgeInsets.only(bottom: 16.0),
+          ),
+        ),
+        Center(
+          child: Button(
+            child: Icon(Icons.play_arrow),
+            color: Colors.red,
+            size: 44.0,onPressed: (){},
+          ),
+        ),
+      ],
     );
   }
 }
