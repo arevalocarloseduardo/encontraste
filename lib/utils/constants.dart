@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 
 class Constanst{
-
-
+  
   Constanst._();
-
-
-
-  static const MOTIVO="motivo";
-  static const PUNTOS="puntos";
-  static const DB_PERSONAS="personas";
-  static const DB_EQUIPOS="equipos";
-  static const NOMBRES="nombres";
-  static const NOMBRE_EQUIPO="nombre";
-  static const ID_PERSONA = "id";
-  static const APELLIDOS="apellidos";
-  static const FECHA_NACIMIENTO = "fecha_nacimiento";
-  static const FECHA = "fecha";
-  static const SEXO="sexo";
-  static const COLOR="color";
-  static const ID_EQUIPO = "id_equipo";
+  static const String MOTIVO= "motivo";
+  static const String PUNTOS="puntos";
+  static const String DB_PERSONAS="personas";
+  static const String DB_EQUIPOS="equipos";
+  static const String NOMBRES="nombres";
+  static const String NOMBRE_EQUIPO="nombre";
+  static const String ID_PERSONA = "id";
+  static const String APELLIDOS="apellidos";
+  static const String FECHA_NACIMIENTO = "fecha_nacimiento";
+  static const String FECHA = "fecha";
+  static const String SEXO="sexo";
+  static const String COLOR="color";
+  static const String ID_EQUIPO = "id_equipo";
+  static const String IMAGEN = "imagen";
+  static const String CELULAR = "celular";
+  static const String EMAIL = "email";
 }
 
 class BereaColors {

@@ -86,7 +86,7 @@ Scaffold view(BuildContext context, ScreenController screenController) {
   return (MediaQuery.of(context).orientation == Orientation.portrait
       ? portrait(screenController)
       : Scaffold(
-          body: screenController.screen,
+         // body: screenController.screen,
         ));
 }
 
@@ -113,6 +113,6 @@ Scaffold portrait(ScreenController screenController) {
             },
           )
         : null,
-    body: screenController.screen,
+   // body: screenController.screen,
   );
 }

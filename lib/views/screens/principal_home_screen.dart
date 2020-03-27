@@ -7,7 +7,6 @@ import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/punto.dart';
 import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
-import 'package:encontraste/utils/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';

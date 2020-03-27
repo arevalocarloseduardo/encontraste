@@ -40,14 +40,18 @@ class DatabaseService {
   }
 
   Future<bool> createPersona(Persona persona) async {
-    await _db.collection(Constanst.DB_PERSONAS).document().setData({
+    await _db.collection(Constanst.DB_PERSONAS).document(persona.id).setData({
       Constanst.NOMBRES: persona.nombres,
       Constanst.APELLIDOS: persona.apellidos,
       Constanst.FECHA_NACIMIENTO: persona.fechaDeNacimiento,
       Constanst.ID_EQUIPO: persona.idEquipo,
       Constanst.SEXO: persona.sexo,
-      Constanst.ID_PERSONA: persona.id
+      Constanst.ID_PERSONA: persona.id,
+      Constanst.EMAIL: persona.email,
+      Constanst.CELULAR: persona.celular,
+      Constanst.IMAGEN: persona.imagen
     }).then((value) {
+      print("cree esta persona: " + persona.toString());
       return true;
     });
     return false;
@@ -81,31 +85,30 @@ class DatabaseService {
     return false;
   }
 
-  Stream<List<Persona>> streamListPersonas({String idEquipo, String nombre,}) {
+  Stream<List<Persona>> streamListPersonas({
+    String idEquipo,
+    String nombre,
+  }) {
     CollectionReference ref = _db.collection(Constanst.DB_PERSONAS);
     Query query;
 
     if (idEquipo != null) {
-      query = ref
-          .where(Constanst.ID_EQUIPO, isEqualTo: idEquipo);
+      query = ref.where(Constanst.ID_EQUIPO, isEqualTo: idEquipo);
       return query.snapshots().map((list) =>
           list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
     } else {
-      
-     
-
       return ref.snapshots().map((list) =>
           list.documents.map((doc) => Persona.fromFirestore(doc)).toList());
     }
   }
+
   Stream<List<Punto>> streamListPuntos() {
     CollectionReference ref = _db.collection(Constanst.PUNTOS);
     Query query;
 
-      query = ref;
-      return query.snapshots().map((list) =>
-          list.documents.map((doc) => Punto.fromFirestore(doc)).toList());
-   
+    query = ref;
+    return query.snapshots().map((list) =>
+        list.documents.map((doc) => Punto.fromFirestore(doc)).toList());
   }
 
   Stream<List<Utils>> streamVer() {
