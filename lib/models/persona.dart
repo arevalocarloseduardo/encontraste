@@ -88,6 +88,19 @@ class Persona {
         email: user.email ?? "",
         imagen: user.photoUrl ?? "");
   }
+  factory Persona.fromOnboard(FirebaseUser firebaseUser, Persona person) {
+    var user = firebaseUser;
+    return Persona(
+        id: user.uid ?? "",
+        nombres: person.nombres ?? "Nuevo" ,
+        apellidos: person.apellidos ?? "Usuario",
+        fechaDeNacimiento: person.fechaDeNacimiento ?? DateTime.now(),
+        sexo: person.sexo ?? "M",
+        celular: person.celular ?? user.phoneNumber ?? "",
+        idEquipo: person.idEquipo ?? "sin equipo",
+        email: user.email ?? "",
+        imagen: person.imagen ?? user.photoUrl ?? "");
+  }
 
   int getEdad() {
     var cumple = this.fechaDeNacimiento;

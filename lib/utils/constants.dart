@@ -24,7 +24,8 @@ class Constanst{
 class BereaColors {
   BereaColors._();
 
-  static const Color purple = Color(0x1ff171b37);
+  static const Color purple = Color(0xff171b37);
+  static const Color secondary = Color(0xffa3a043);
 
   static const Color f = Colors.pinkAccent;
 

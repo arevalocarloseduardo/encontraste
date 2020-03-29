@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encontraste/models/equipo.dart';
 import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/reunion.dart';
-import 'package:encontraste/services/database_service.dart';
+//import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +43,7 @@ class JuegoController with ChangeNotifier {
   }
 
   init() {
-    var personasS = DatabaseService().streamPersonaListen();
+    //var personasS = DatabaseService().streamPersonaListen();
     List<Equipo> equiposStream = [];
     Firestore.instance
         .collection(Constanst.DB_EQUIPOS)

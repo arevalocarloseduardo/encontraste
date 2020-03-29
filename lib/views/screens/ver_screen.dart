@@ -1,4 +1,4 @@
-import 'package:encontraste/models/persona.dart';
+
 import 'package:encontraste/models/punto.dart';
 import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
@@ -138,7 +138,7 @@ class _VerScreenState extends State<VerScreen> {
           .motivo; // principalHomeController.equipo.personas[i].nombres[0];
       var dia = personas[i].fecha.day.toString(); 
       var mes = personas[i].fecha.month.toString();
-      var id = personas[i].puntos;
+      //var id = personas[i].puntos;
 
       listTile.add(Column(
         children: <Widget>[

@@ -21,7 +21,7 @@ class AuthController with ChangeNotifier {
   static BuildContext context;
 
   static AuthController get shared => Provider.of<AuthController>(context);
-  StreamController<Status> _statusUser = StreamController.broadcast();
+  //StreamController<Status> _statusUser = StreamController.broadcast();
   final db = DatabaseService();
   StreamSubscription userAuthSub;
   var screen = ScreenController.shared;
@@ -113,7 +113,6 @@ class AuthController with ChangeNotifier {
     notifyListeners();
   }
 
- 
   Future<Status> addUserToBase(Persona user) async {
     Persona persona = await db.getPersona(user.id);
     bool isPersonaIntoBase = persona.id.isNotEmpty;
@@ -124,7 +123,6 @@ class AuthController with ChangeNotifier {
         print("usuario registrado y con equipo asignado");
         return Status.Authenticated;
       } else {
-        
         print("usuario registrado y sin equipo asignado");
         return Status.AuthenticatedWithoutDate;
       }

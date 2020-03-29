@@ -1,6 +1,6 @@
 import 'package:encontraste/views/screens/home_page.dart';
-import 'package:encontraste/views/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/global_controller.dart';
@@ -9,8 +9,13 @@ import 'controllers/principal_home_controller.dart';
 import 'controllers/screen_controller.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main()   {
-  runApp(Encontraste());
+import 'views/screens/onboard_team/onboard_controller.dart';
+
+void main() {WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+    .then((_) {
+      runApp(Encontraste());
+    });
 }
 
 class Encontraste extends StatelessWidget {
@@ -23,6 +28,9 @@ class Encontraste extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => JuegoController()),
           ChangeNotifierProvider(create: (_) => AuthController()),
           ChangeNotifierProvider(create: (_) => GlobalController()),
+          ChangeNotifierProvider(
+            create: (_) => OnboardController(),
+          )
         ],
         child: MaterialApp(
           builder: (context, child) {

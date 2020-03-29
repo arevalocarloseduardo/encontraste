@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:encontraste/controllers/auth_controller.dart';
 import 'package:encontraste/views/screens/login.dart';
@@ -6,6 +5,8 @@ import 'package:encontraste/views/screens/principal_home_screen.dart';
 import 'package:encontraste/views/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'onboard_team/onboard_welcome.dart';
 
 class MyHomePage extends StatelessWidget {
   @override
@@ -27,7 +28,7 @@ class MyHomePage extends StatelessWidget {
         body = SplashScreen();
         break;
       case Status.AuthenticatedWithoutDate:
-        body = Scaffold(body: Text("hola"),);
+        body = OnboardWelcome(authProvider.user);
         break;
       default:
         body = SplashScreen();
