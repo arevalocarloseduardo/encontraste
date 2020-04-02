@@ -13,7 +13,7 @@ class BereaOnboardButton extends StatefulWidget {
     this.enabled = true,
     this.child,
   });
-
+  
   final String text;
   final Function onPressed;
   final EdgeInsetsGeometry padding;
@@ -40,49 +40,36 @@ class _BereaOnboardButtonState extends State<BereaOnboardButton> {
             ? ColorFilter.mode(Colors.black.withOpacity(0.0), BlendMode.dstOut)
             : ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.dstOut),
         child: FlatButton(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
-          padding: EdgeInsets.all(0.0),
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    BereaColors.secondary,
-                    BereaColors.purple,
-                  ]),
-              border: Border.all(color: Colors.white54),
-              borderRadius: BorderRadius.all(Radius.circular(80.0)),
-            ),
-            child: Container(
-              constraints: BoxConstraints(minWidth: 150, minHeight: 62),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(widget.text ?? "",
-                      style: TextStyle(color: Colors.white, fontSize: 22))
-                ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(80.0)),
+            padding: EdgeInsets.all(0.0),
+            child: Ink(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      BereaColors.secondary,
+                      BereaColors.purple,
+                    ]),
+                border: Border.all(color: Colors.white54),
+                borderRadius: BorderRadius.all(Radius.circular(80.0)),
+              ),
+              child: Container(
+                constraints: BoxConstraints(minWidth: 150, minHeight: 62),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(widget.text ?? "",
+                        style: TextStyle(color: Colors.white, fontSize: 22))
+                  ],
+                ),
               ),
             ),
-          ),
-          onPressed: widget.enabled
-              ? () async {
-                  if (!loading) {
-                    loading = true;
-                    try {
-                      await widget.onPressed();
-                    } catch (e) {
-                      print(e);
-                    }
-                    loading = false;
-                  }
-                }
-              : null,
-        ),
+            onPressed: widget.onPressed),
       ),
     );
   }

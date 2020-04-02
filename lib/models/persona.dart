@@ -57,22 +57,24 @@ class Persona {
   }
   factory Persona.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
-
-    var cumple = DateTime.fromMicrosecondsSinceEpoch(
-        data[Constanst.FECHA_NACIMIENTO] == null
-            ? DateTime.now().microsecondsSinceEpoch
-            : data[Constanst.FECHA_NACIMIENTO].microsecondsSinceEpoch);
-    return Persona(
-      id: doc.documentID ?? "",
-      idEquipo: data[Constanst.ID_EQUIPO] ?? "",
-      nombres: data[Constanst.NOMBRES] ?? "",
-      apellidos: data[Constanst.APELLIDOS] ?? "",
-      fechaDeNacimiento: cumple,
-      sexo: data[Constanst.SEXO] ?? "",
-      imagen: data[Constanst.IMAGEN] ?? "",
-      celular: data[Constanst.CELULAR] ?? "",
-      email: data[Constanst.EMAIL] ?? "",
-    );
+    if (data != null) {
+      var cumple = DateTime.fromMicrosecondsSinceEpoch(
+          data[Constanst.FECHA_NACIMIENTO] == null
+              ? DateTime.now().microsecondsSinceEpoch
+              : data[Constanst.FECHA_NACIMIENTO].microsecondsSinceEpoch);
+      return Persona(
+        id: doc.documentID ?? "",
+        idEquipo: data[Constanst.ID_EQUIPO] ?? "",
+        nombres: data[Constanst.NOMBRES] ?? "",
+        apellidos: data[Constanst.APELLIDOS] ?? "",
+        fechaDeNacimiento: cumple,
+        sexo: data[Constanst.SEXO] ?? "",
+        imagen: data[Constanst.IMAGEN] ?? "",
+        celular: data[Constanst.CELULAR] ?? "",
+        email: data[Constanst.EMAIL] ?? "",
+      );
+    }
+    return null;
   }
 
   factory Persona.fromFirebase(FirebaseUser firebaseUser) {
@@ -92,7 +94,7 @@ class Persona {
     var user = firebaseUser;
     return Persona(
         id: user.uid ?? "",
-        nombres: person.nombres ?? "Nuevo" ,
+        nombres: person.nombres ?? "Nuevo",
         apellidos: person.apellidos ?? "Usuario",
         fechaDeNacimiento: person.fechaDeNacimiento ?? DateTime.now(),
         sexo: person.sexo ?? "M",

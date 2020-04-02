@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
 
-class Constanst{
+class Constanst { 
   
   Constanst._();
-  static const String MOTIVO= "motivo";
-  static const String PUNTOS="puntos";
-  static const String DB_PERSONAS="personas";
-  static const String DB_EQUIPOS="equipos";
-  static const String NOMBRES="nombres";
-  static const String NOMBRE_EQUIPO="nombre";
+
+  static const String AUDIO = "audio";  
+  static const String JUGADOR="jugador";
+  static const String VIDEO = "video";
+  static const String SALAS = "salas";  
+  static const ID_SALA="id";
+  static const String CHANNEL_NAME = "channel_name";
+  static const String DISPONIBLE = "disponible";
+  static const String INTEGRANTES = "integrantes";
+  static const String SALA_NAME = "nombre";
+  static const String MOTIVO = "motivo";
+  static const String PUNTOS = "puntos";
+  static const String DB_PERSONAS = "personas";
+  static const String DB_EQUIPOS = "equipos";
+  static const String NOMBRES = "nombres";
+  static const String NOMBRE_EQUIPO = "nombre";
   static const String ID_PERSONA = "id";
-  static const String APELLIDOS="apellidos";
+  static const String APELLIDOS = "apellidos";
   static const String FECHA_NACIMIENTO = "fecha_nacimiento";
   static const String FECHA = "fecha";
-  static const String SEXO="sexo";
-  static const String COLOR="color";
+  static const String SEXO = "sexo";
+  static const String COLOR = "color";
   static const String ID_EQUIPO = "id_equipo";
   static const String IMAGEN = "imagen";
   static const String CELULAR = "celular";
@@ -31,9 +41,10 @@ class BereaColors {
 
   static const Color m = Colors.cyan;
 }
+
 class BereaStyles {
   BereaStyles._();
 
-  static const TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
- 
+  static const TextStyle style =
+      TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 }

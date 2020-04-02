@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:encontraste/utils/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 
 class Utils {
   bool apreto1;

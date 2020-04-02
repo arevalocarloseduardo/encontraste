@@ -15,7 +15,7 @@ class _VerScreenState extends State<VerScreen> {
   List<Utils> utils;
   var height;
   var width;
-  
+  var voy =true;
     String nombre="";
 
   List<Punto> personas;
@@ -23,7 +23,7 @@ class _VerScreenState extends State<VerScreen> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-    return true
+    return voy
         ? Container(
             child: StreamBuilder<List<Punto>>(
               stream: db.streamListPuntos(),

@@ -1,24 +1,34 @@
+ import 'package:encontraste/views/screens/home_page/game_page/select_salas.dart';
+import 'package:encontraste/views/screens/home_page/home_screen.dart';
+import 'package:encontraste/views/screens/home_page/perfil_page/perfil_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:encontraste/views/screens/login.dart';
 import 'package:encontraste/views/screens/ver_screen.dart';
-import 'package:encontraste/views/screens/juego_screen.dart';
-import 'package:encontraste/controllers/auth_controller.dart';
-import 'package:encontraste/views/screens/splash_screen.dart';
-import 'package:encontraste/views/screens/principal_home_screen.dart';
 import 'package:provider/provider.dart';
 
 class ScreenController with ChangeNotifier {
-  
-   // AuthController.shared.statusUserChanged.listen(_onAuthStateChanged);
-  
   static BuildContext context;
 
   static ScreenController get shared => Provider.of<ScreenController>(context);
 
-  bool _botomBarPrincipal = false;
+  Widget _screen;
+  Widget get screen => _screen;
+
+  set screen(Widget value) {
+    _screen = value;
+    notifyListeners();
+  }
+
+  bool _botomBarPrincipal = true;
   bool get botomBarPrincipal => _botomBarPrincipal;
-  void setBotomBarPrincipal(bool value) {
+  set botomBarPrincipal(bool value) {
     _botomBarPrincipal = value;
+    notifyListeners();
+  }
+
+  bool _appBar = true;
+  bool get appBar => _appBar;
+  set appBar(bool value) {
+    _appBar = value;
     notifyListeners();
   }
 
@@ -30,25 +40,6 @@ class ScreenController with ChangeNotifier {
     notifyListeners();
   }
 
-  onAuthStateChanged(Status userStatus) {
-    switch (userStatus) {
-      case Status.Uninitialized:
-       // pushScreen(SplashScreen());
-        break;
-      case Status.Unauthenticated:
-       pushScreen(LoginScreen());
-        break;
-      case Status.Authenticating:
-       pushScreen(SplashScreen());
-        break;
-      case Status.Authenticated:
-        pushScreen(PrincipalHomeScreen());
-        break;
-      default:
-        pushScreen(SplashScreen());
-    }
-  }
-
   pushScreen(screen) {
     Navigator.push(
         context, MaterialPageRoute(builder: (BuildContext context) => screen));
@@ -57,22 +48,15 @@ class ScreenController with ChangeNotifier {
   void switchScreen(int value) {
     switch (value) {
       case 0:
-        goto(screen: PrincipalHomeScreen());
+        screen = HomeScreen();
         break;
       case 1:
-        goto(screen: VerScreen());
+        screen = SelectSala();
         break;
       case 2:
-        goto(screen: JuegoScreen());
+        screen = PerfilScreen();
         break;
       default:
     }
-  }
-
-  goto({Widget screen, int delay = 0}) async {
-    await Future.delayed(Duration(seconds: delay), () {
-      // _screen = screen;
-    });
-    notifyListeners();
   }
 }

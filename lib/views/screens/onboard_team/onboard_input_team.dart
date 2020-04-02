@@ -1,8 +1,11 @@
+ 
+import 'package:encontraste/views/screens/home_page/home_page.dart'; 
 import 'package:encontraste/views/screens/onboard_team/onboard_controller.dart';
 import 'package:encontraste/views/widgets/berea_onbord_button.dart';
 import 'package:encontraste/views/widgets/berea_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+  
 
 class OnboardInputTeam extends StatelessWidget {
   @override
@@ -34,7 +37,7 @@ class OnboardInputTeam extends StatelessWidget {
                 BereaSwitch(
                   value: state.person.idEquipo == null
                       ? true
-                      : state.person.idEquipo == "0OtwyNJ5VMlYrhjKWLjd", 
+                      : state.person.idEquipo == "0OtwyNJ5VMlYrhjKWLjd",
                   textOn: 'Celeste',
                   textOff: 'Naranja',
                   colorOn: Colors.lightBlue[600],
@@ -45,7 +48,9 @@ class OnboardInputTeam extends StatelessWidget {
                   onChanged: (bool value) {
                     print(value);
                     print(value ? "celeste" : "naranaja");
-                    state.person.idEquipo = value ? "0OtwyNJ5VMlYrhjKWLjd" : "vuEV8viTnRUBe2bL4aGO";//naranja
+                    state.person.idEquipo = value
+                        ? "0OtwyNJ5VMlYrhjKWLjd"
+                        : "vuEV8viTnRUBe2bL4aGO"; //naranja
                   },
                 ),
               ],
@@ -72,8 +77,14 @@ class OnboardInputTeam extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: BereaOnboardButton(
-                        onPressed: () {
-                          state.nextWidget();
+                        onPressed: () async {
+                          var value = await state.nextWidget();
+                          if (value) {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()));
+                          }
                         },
                         text: "Finalizar",
                       ),
@@ -81,8 +92,15 @@ class OnboardInputTeam extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: BereaOnboardButton(
-                        onPressed: () {
-                          state.nextWidget(thisWidgetComplet: false);
+                        onPressed: () async {
+                          state.person.idEquipo = "sin equipo";
+                          var value =
+                              await state.nextWidget(thisWidgetComplet: false);
+                          if (value) {
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()));
+                          }
                         },
                         text: "Continuar sin equipo",
                       ),

@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:encontraste/models/persona.dart';
+import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/views/screens/onboard_team/onboard_date_birth.dart';
 import 'package:encontraste/views/screens/onboard_team/onboard_input_selfie.dart';
 import 'package:encontraste/views/screens/onboard_team/onboard_input_sex.dart';
@@ -14,15 +15,15 @@ import 'onboard_input_names.dart';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
-import 'package:image/image.dart' as img;
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
+import 'package:image/image.dart' as img; 
+import 'package:path_provider/path_provider.dart'; 
 import 'dart:developer';
 import 'dart:io';
 import 'package:exif/exif.dart';
 
 class OnboardController with ChangeNotifier {
+  final db = DatabaseService();
+
   FirebaseUser _user;
   FirebaseUser get user => _user;
   set user(FirebaseUser user) {
@@ -153,16 +154,18 @@ class OnboardController with ChangeNotifier {
     notifyListeners();
   }
 
-  void nextWidget({bool thisWidgetComplet = true}) {
+  Future<bool> nextWidget({bool thisWidgetComplet = true}) {
     if (thisWidgetComplet) {
       completWidget(index: _widgetOnboard.index);
     }
     if (_widgetOnboard.index == _listWidgetOnboard.length - 1) {
       print("complete");
-      finalizarOnboard();
+      return finalizarOnboard();
+
     } else {
       selectWidget(index: _widgetOnboard.index + 1);
     }
+    return Future.value(false);
   }
 
   void selectPage(int index) {
@@ -278,10 +281,10 @@ class OnboardController with ChangeNotifier {
 
       final croppedImage = img.copyCrop(image, (newX - newPosX).toInt(),
           (newY - newPosY).toInt(), newW, newH);
- var imag =img.encodeJpg(croppedImage);
- 
+      var imag = img.encodeJpg(croppedImage);
+
       startUpload(imag);
-      nextWidget();  
+      nextWidget();
     } catch (e) {
       picture = null;
       posY = 0;
@@ -397,7 +400,7 @@ class OnboardController with ChangeNotifier {
             CameraController(cam, ResolutionPreset.high, enableAudio: false);
         await tempCam.initialize();
         camera = tempCam;
-      notifyListeners();
+        notifyListeners();
       }
     } else {
       //await camera.initialize();
@@ -410,9 +413,9 @@ class OnboardController with ChangeNotifier {
   }
 
   /// Starts an upload task
-  void startUpload( data ) {
+  void startUpload(data) {
     /// Unique file name for the file
-      
+
     String filePath = 'images/${user.uid}.jpg';
 
     StorageReference storageReference =
@@ -427,16 +430,20 @@ class OnboardController with ChangeNotifier {
     });
   }
 
-  void finalizarOnboard() {
+  Future<bool> finalizarOnboard() async {
     person = Persona.fromOnboard(user, person);
-    print("sexo: " + person.sexo);
-    print("Nmbres: " + person.nombres);
-    print("apellido: " + person.apellidos);
-    print("Fechade nacimiento: " + person.fechaDeNacimiento.toString());
-    print("celular: " + person.celular);
-    print("email: " + person.email);
-    print("imagen: " + person.imagen);
-    print("equipo: " + person.idEquipo);
+    await db.updatePersona(person);
+    print("termine de cargar ");
+    return true;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _telController.dispose();
+    _nombres.dispose();
+    _apellidos.dispose();
+    _camera.dispose();
   }
 }
 

@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encontraste/models/equipo.dart';
 import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/reunion.dart';
-import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-class PrincipalHomeController with ChangeNotifier {
-  PrincipalHomeController() {
+class HomeController with ChangeNotifier {
+  HomeController() {
     print("inicio provider");
     init();
   }
@@ -31,7 +30,7 @@ class PrincipalHomeController with ChangeNotifier {
 
   Reunion _reunion;
   List<Equipo> _equipos;
-  Equipo _equipo=Equipo();
+  Equipo _equipo = Equipo();
 
   Reunion get reunion => _reunion;
   List<Equipo> get equipos => _equipos;
@@ -43,7 +42,7 @@ class PrincipalHomeController with ChangeNotifier {
   }
 
   init() {
-    var personasS = DatabaseService().streamPersonaListen();
+    // var personasS = DatabaseService().streamPersonaListen();
     List<Equipo> equiposStream = [];
     Firestore.instance
         .collection(Constanst.DB_EQUIPOS)
@@ -52,15 +51,14 @@ class PrincipalHomeController with ChangeNotifier {
       var liste =
           onData.documents.map((snap) => Equipo.fromFirestore(snap)).toList();
       print(liste.length);
-
       notifyListeners();
       if (liste != null) {
         equiposStream = liste;
         _reunion = Reunion(tipo: "Jovenes", equipos: equiposStream);
         _select.clear();
-        for (var item in _reunion.equipos) {
+        _reunion.equipos.forEach((f) {
           _select.add(false);
-        }
+        });
       }
     });
   }

@@ -199,8 +199,7 @@ class Validators {
     return diferencia == digitoVerificador;
   }
 
-  static String validateCBU(String cbuTemp) {
-    List<String> cbuList=[];
+  static String validateCBU(String cbuTemp) { 
     String cbu="";
     var temp = cbuTemp.split("");
     var parts = List<String>.from(temp);

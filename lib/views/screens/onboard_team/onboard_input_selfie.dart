@@ -11,8 +11,6 @@ import 'onboard_controller.dart';
 class OnboardInputSelfie extends StatelessWidget {
   static final String routeName = '/profile_picture';
 
-  var tome = false;
-
   @override
   Widget build(BuildContext context) {
     final viewHeight = MediaQuery.of(context).size.height;
@@ -34,63 +32,67 @@ class OnboardInputSelfie extends StatelessWidget {
                 )
               : CircularProgressIndicator(),
 
-          if (state.picture != null)
-            Positioned(
-              top: state.posY,
-              left: state.posX,
-              height: viewHeight-((viewHeight/21)*4),
-              width: viewWidth,
-              child: Transform(
-                transform: Matrix4.diagonal3(
-                    Vector3(state.scale, state.scale, state.scale)),
-                child: Image.file(
-                  state.picture,
-                ),
-              ),
-            ),
+          (state.picture != null)
+              ? Positioned(
+                  top: state.posY,
+                  left: state.posX,
+                  height: viewHeight - ((viewHeight / 21) * 4),
+                  width: viewWidth,
+                  child: Transform(
+                    transform: Matrix4.diagonal3(
+                        Vector3(state.scale, state.scale, state.scale)),
+                    child: Image.file(
+                      state.picture,
+                    ),
+                  ),
+                )
+              : Container(),
 
           // Clipper
           ClipPath(
             clipper: _PictureInputClipper(),
             child: Container(
-              color: Colors.white38,
+              color: BereaColors.purple,
             ),
           ),
-          // Picture editing
-          if (state.picture != null)
-            GestureDetector(
-              onScaleStart: (ScaleStartDetails details) {
-                state.initialX = details.focalPoint.dx;
-                state.initialY = details.focalPoint.dy;
-                state.previousScale = state.scale;
-              },
-              onScaleUpdate: (ScaleUpdateDetails details) {
-                final distanceX = details.focalPoint.dx - state.initialX;
-                final distanceY = details.focalPoint.dy - state.initialY;
-                state.initialX = details.focalPoint.dx;
-                state.initialY = details.focalPoint.dy;
+          // Picture editing?
+          (state.picture != null)
+              ? GestureDetector(
+                  onScaleStart: (ScaleStartDetails details) {
+                    state.initialX = details.focalPoint.dx;
+                    state.initialY = details.focalPoint.dy;
+                    state.previousScale = state.scale;
+                  },
+                  onScaleUpdate: (ScaleUpdateDetails details) {
+                    final distanceX = details.focalPoint.dx - state.initialX;
+                    final distanceY = details.focalPoint.dy - state.initialY;
+                    state.initialX = details.focalPoint.dx;
+                    state.initialY = details.focalPoint.dy;
 
-                if (state.posY + distanceY < (viewHeight-((viewHeight/21))*4) * 0.15 &&
-                    state.posY + distanceY > -((viewHeight-((viewHeight/21))*4) * 0.15)) {
-                  state.posY += distanceY;
-                }
-                if (state.posX + distanceX < viewWidth * 0.15 &&
-                    state.posX + distanceX > -(viewWidth * 0.15)) {
-                  state.posX += distanceX;
-                }
+                    if (state.posY + distanceY <
+                            (viewHeight - ((viewHeight / 21)) * 4) * 0.15 &&
+                        state.posY + distanceY >
+                            -((viewHeight - ((viewHeight / 21)) * 4) * 0.15)) {
+                      state.posY += distanceY;
+                    }
+                    if (state.posX + distanceX < viewWidth * 0.15 &&
+                        state.posX + distanceX > -(viewWidth * 0.15)) {
+                      state.posX += distanceX;
+                    }
 
-                if (state.previousScale * details.scale < 1.15 &&
-                    state.previousScale * details.scale > 0.85) {
-                  state.scale = state.previousScale * details.scale;
-                }
-              },
-              onScaleEnd: (ScaleEndDetails details) {
-                state.previousScale = 1.0;
-              },
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
+                    if (state.previousScale * details.scale < 1.15 &&
+                        state.previousScale * details.scale > 0.85) {
+                      state.scale = state.previousScale * details.scale;
+                    }
+                  },
+                  onScaleEnd: (ScaleEndDetails details) {
+                    state.previousScale = 1.0;
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                  ),
+                )
+              : Container(),
           // Header
 
           Container(
@@ -185,8 +187,6 @@ class OnboardInputSelfie extends StatelessWidget {
 class _PictureInputClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    final double percentageH = 0.325;
-    final double percentageW = 0.9;
     Path path = Path();
     path.addRRect(RRect.fromRectAndRadius(
         Rect.fromCircle(

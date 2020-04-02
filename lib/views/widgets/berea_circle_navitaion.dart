@@ -49,6 +49,8 @@ class BereaCirclePosition extends StatelessWidget {
                       : ColorFilter.mode(
                           Colors.black.withOpacity(0.7), BlendMode.dstOut),
               child: FloatingActionButton(
+                
+              heroTag: "Increment $ordenPosition",
                   elevation: 24.5,
                   backgroundColor: BereaColors.secondary,
                   onPressed: onPressed ?? () {},

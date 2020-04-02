@@ -31,7 +31,7 @@ class JuegoController with ChangeNotifier {
 
   Reunion _reunion;
   List<Equipo> _equipos;
-  Equipo _equipo=Equipo();
+  Equipo _equipo = Equipo();
 
   Reunion get reunion => _reunion;
   List<Equipo> get equipos => _equipos;
@@ -58,9 +58,10 @@ class JuegoController with ChangeNotifier {
         equiposStream = liste;
         _reunion = Reunion(tipo: "Jovenes", equipos: equiposStream);
         _select.clear();
-        for (var item in _reunion.equipos) {
+
+        _reunion.equipos.forEach((f) {
           _select.add(false);
-        }
+        });
       }
     });
   }

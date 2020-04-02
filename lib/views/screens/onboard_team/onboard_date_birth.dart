@@ -11,9 +11,7 @@ class OnboardInputDateBirth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     OnboardController state = Provider.of<OnboardController>(context);
-
-    var time2 = DateTime(1995);
-
+ 
     final format = DateFormat("yyyy-MM-dd");
     return Container(
         child: Column(
@@ -66,6 +64,7 @@ class OnboardInputDateBirth extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                     format: format,
                     onShowPicker: (context, currentValue) async {
+                   
                       var times = await showDatePicker(
                           context: context,
                           locale: Locale("es", "ES"),
@@ -82,6 +81,7 @@ class OnboardInputDateBirth extends StatelessWidget {
                             );
                           });
                       state.setFecha(times ?? DateTime(1995, 7, 17));
+                      return currentValue;//ojo que cambie aca 
                     },
                   ),
                 ),

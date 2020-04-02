@@ -1,8 +1,7 @@
-import 'package:encontraste/controllers/auth_controller.dart';
+/*import 'package:encontraste/controllers/auth_controller.dart';
 import 'package:encontraste/controllers/principal_home_controller.dart';
 import 'package:encontraste/controllers/screen_controller.dart';
-import 'package:encontraste/models/equipo.dart';
-import 'package:encontraste/models/juego.dart';
+import 'package:encontraste/models/equipo.dart'; 
 import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/punto.dart';
 import 'package:encontraste/services/database_service.dart';
@@ -12,15 +11,16 @@ import 'package:provider/provider.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 
-class PrincipalHomeScreen extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _PrincipalHomeScreenState createState() => _PrincipalHomeScreenState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
+class _HomePageState extends State<HomePage> {
   var width;
   var height;
   PrincipalHomeController principalHomeController;
+  ScreenController screenController;
   final db = DatabaseService();
   List<Persona> personas;
   AuthController authUser;
@@ -29,9 +29,31 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     principalHomeController = Provider.of<PrincipalHomeController>(context);
+    screenController = Provider.of<ScreenController>(context);
     authUser = Provider.of<AuthController>(context);
 
     return Scaffold(
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: screenController
+              .currentIndexBottom, 
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
+            ),
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.tv),
+              title: new Text('ver'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text('perfil'),
+            )
+          ],
+          onTap: (val) {
+            screenController.currentIndexBottom = val;
+          },
+        ),
         appBar: AppBar(
           backgroundColor: BereaColors.purple,
           title: GestureDetector(
@@ -689,3 +711,4 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+*/

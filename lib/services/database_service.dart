@@ -4,11 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encontraste/models/equipo.dart';
 import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/punto.dart';
+import 'package:encontraste/models/sala.dart';
 import 'package:encontraste/models/utils.dart';
 import 'package:encontraste/utils/constants.dart';
 
 class DatabaseService {
   final Firestore _db = Firestore.instance;
+
+  Persona personaListen(Persona persona) {
+    _db
+        .collection(Constanst.DB_PERSONAS)
+        .document(persona.id)
+        .snapshots()
+        .listen((onData) {
+      return onData.reference
+          .snapshots()
+          .map((snap) => Persona.fromMap(snap.data))
+          .toList();
+    });
+    return persona;
+  }
 
   Future<Persona> getPersona(String id) async {
     var snap = await _db.collection(Constanst.DB_PERSONAS).document(id).get();
@@ -29,6 +44,15 @@ class DatabaseService {
           .map((snap) => Persona.fromMap(snap.document.data))
           .toList();
     });
+    return null;
+  }
+
+  Stream<DocumentSnapshot> streamSubPersonaListen(String id) {
+    return _db.collection(Constanst.DB_PERSONAS).document(id).snapshots();
+  }
+
+  Stream<QuerySnapshot> streamSalasListen() {
+    return _db.collection(Constanst.SALAS).snapshots();
   }
 
   List<Equipo> streamEquiposListen() {
@@ -37,6 +61,8 @@ class DatabaseService {
           .map((snap) => Equipo.fromMap(snap.document.data))
           .toList();
     });
+
+    return null;
   }
 
   Future<bool> createPersona(Persona persona) async {
@@ -58,17 +84,22 @@ class DatabaseService {
   }
 
   Future<bool> updatePersona(Persona persona) async {
-    await _db
-        .collection(Constanst.DB_PERSONAS)
-        .document(persona.id)
-        .updateData({
+    Map<String, dynamic> map = {
       Constanst.NOMBRES: persona.nombres,
       Constanst.APELLIDOS: persona.apellidos,
       Constanst.FECHA_NACIMIENTO: persona.fechaDeNacimiento,
       Constanst.ID_EQUIPO: persona.idEquipo,
       Constanst.SEXO: persona.sexo,
-      Constanst.ID_PERSONA: persona.id
-    }).then((value) {
+      Constanst.ID_PERSONA: persona.id,
+      Constanst.EMAIL: persona.email,
+      Constanst.CELULAR: persona.celular,
+      Constanst.IMAGEN: persona.imagen,
+    };
+    await _db
+        .collection(Constanst.DB_PERSONAS)
+        .document(persona.id)
+        .updateData(map)
+        .then((value) {
       return true;
     });
     return false;
@@ -176,6 +207,43 @@ class DatabaseService {
     }).then((value) {
       return true;
     });
+    return false;
+  }
+
+  Future<bool> ingreseSala(Sala sala, String uid) async {
+    var snap = await _db.collection(Constanst.SALAS).document(sala.id).get();
+    var value = Sala.fromFirestore(snap);
+    _db
+        .collection(Constanst.SALAS)
+        .document(sala.id)
+        .updateData({Constanst.INTEGRANTES: value.integrantes + 1});
+    _db
+        .collection(Constanst.SALAS)
+        .document(sala.id)
+        .collection(Constanst.INTEGRANTES)
+        .document(uid)
+        .setData({
+      Constanst.ID_PERSONA: uid,
+      Constanst.AUDIO: false,
+      Constanst.JUGADOR: false,
+      Constanst.VIDEO: false,
+    });
+    return false;
+  }
+
+  Future<bool> saliSala(Sala sala, String uid) async {
+    var snap = await _db.collection(Constanst.SALAS).document(sala.id).get();
+    var value = Sala.fromFirestore(snap);
+    _db
+        .collection(Constanst.SALAS)
+        .document(sala.id)
+        .updateData({Constanst.INTEGRANTES: value.integrantes - 1});
+    _db
+        .collection(Constanst.SALAS)
+        .document(sala.id)
+        .collection(Constanst.INTEGRANTES)
+        .document(uid)
+        .delete();
     return false;
   }
 }
