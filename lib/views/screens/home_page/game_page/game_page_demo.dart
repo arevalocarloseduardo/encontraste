@@ -1,54 +1,68 @@
-import 'package:agora_rtm/agora_rtm.dart';
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encontraste/controllers/rtm_controller.dart';
+import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/sala.dart';
-import 'package:encontraste/utils/settings.dart';
+import 'package:encontraste/models/status_gamer.dart';
+import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/views/widgets/draw_widget.dart';
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 
 class GamePageDemo extends StatefulWidget {
-  GamePageDemo({this.sala});
+  GamePageDemo({this.sala, this.persona});
   final Sala sala;
-
+  final Persona persona;
   @override
   _GamePageDemoState createState() => _GamePageDemoState();
 }
 
 class _GamePageDemoState extends State<GamePageDemo> {
- 
+  StreamSubscription gamerStatus;
+  final _db = DatabaseService();
   bool _finished;
 
   PainterController _controller;
 
   RtmController rtm;
+  StatusGamer status;
+
+  TextEditingController text = TextEditingController();
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-    rtm = Provider.of<RtmController>(context);
-  }
- @override
   void dispose() {
     super.dispose();
     rtm.salirSala(widget.sala);
+    text.dispose();
+    gamerStatus.cancel();
   }
-@override
+
+  @override
   void initState() {
+    text.text = "";
+    _finished = false;
+    _controller = _newController();
+    gamerStatus = _db
+        .streamGamerListen(widget.sala, widget.persona.id)
+        .listen(_onGamerChanged);
     super.initState();
-    _finished=false;
-    _controller=_newController();
   }
+
+  _onGamerChanged(DocumentSnapshot onData) {
+    setState(() {
+      status = StatusGamer.fromMap(onData.data);
+    });
+  }
+
   PainterController _newController() {
     PainterController controller = new PainterController();
-    controller.thickness = 5.0;
+    controller.thickness = 3.0;
     controller.backgroundColor = Colors.white;
     return controller;
   }
 
   @override
   Widget build(BuildContext context) {
+    rtm = Provider.of<RtmController>(context);
     List<Widget> actions;
     if (_finished) {
       actions = <Widget>[
@@ -81,39 +95,68 @@ class _GamePageDemoState extends State<GamePageDemo> {
             child: new DrawBar(_controller),
             preferredSize: new Size(MediaQuery.of(context).size.width, 30.0),
           )),
-      body: Column(
-        children: <Widget>[
-          Center(
-              child: new AspectRatio(
-                  aspectRatio: 1.0,
-                  child: new Painter(painterController: _controller))),
-          Center(
-              child: new AspectRatio(
-                  aspectRatio: 1.0,
-                  child: new Painter(
-                      painterController: _controller,
-                      draw: true,
-                      map: [
-                        {"dx": 124.36, "dy": 124.36},
-                        {"dx": 126.18, "dy": 126.18},
-                        {"dx": 129.82, "dy": 129.82},
-                        {"dx": 132.36, "dy": 132.36},
-                        {"dx": 138.18, "dy": 138.18},
-                        {"dx": 140.36, "dy": 140.36},
-                        {"dx": 143.27, "dy": 143.27},
-                        {"dx": 145.09, "dy": 145.09},
-                        {"dx": 145.82, "dy": 145.82},
-                        {"dx": 147.64, "dy": 147.64},
-                        {"dx": 148.73, "dy": 148.73},
-                        {"dx": 149.45, "dy": 149.45},
-                        {"dx": 149.45, "dy": 149.45},
-                        {"dx": 149.45, "dy": 149.45},
-                        {"dx": 149.45, "dy": 149.45},
-                        {"dx": 149.82, "dy": 149.82},
-                        {"dx": 150.55, "dy": 150.55}
-                      ]))),
-        ],
-      ),
+      body: status == null
+          ? CircularProgressIndicator()
+          : status.jugador
+              ? Column(
+                  children: <Widget>[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Text(
+                          "Dibuja lo siguiente: ",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                          "${status.adivina}",
+                          style: TextStyle(fontSize: 26, color: Colors.green),
+                        ),
+                      ],
+                    ),
+                    Center(
+                        child: new AspectRatio(
+                            aspectRatio: 1.0,
+                            child:
+                                new Painter(painterController: _controller))),
+                  ],
+                )
+              : Column(
+                  children: <Widget>[
+                    Center(
+                      child: new AspectRatio(
+                          aspectRatio: 1.0,
+                          child: new Painter(
+                              painterController: _controller,
+                              draw: false,
+                              status: status)),
+                    ),
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Material(
+                          child: TextFormField(
+                            controller: text,
+                            decoration: InputDecoration(
+                                hintText: "escribe lo que es",
+                                suffixIcon: InkWell(
+                                    onTap: () {
+                                      if (text.text == status.adivina) {
+                                        print("gano");
+                                        text.text = "";
+                                      } else {
+                                        print("sigue intentando");
+                                        text.text = "";
+                                      }
+                                    },
+                                    child: Icon(Icons.send))),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
     );
   }
 }
@@ -140,9 +183,8 @@ class DrawBar extends StatelessWidget {
             max: 20.0,
             activeColor: Colors.white,
           ));
-        })), 
+        })),
       ],
     );
   }
 }
- 

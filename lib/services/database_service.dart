@@ -55,6 +55,15 @@ class DatabaseService {
     return _db.collection(Constanst.SALAS).snapshots();
   }
 
+  Stream<DocumentSnapshot> streamGamerListen(Sala sala, String myId) {
+    return _db
+        .collection(Constanst.SALAS)
+        .document(sala.id)
+        .collection(Constanst.INTEGRANTES)
+        .document(myId)
+        .snapshots();
+  }
+
   List<Equipo> streamEquiposListen() {
     _db.collection(Constanst.DB_EQUIPOS).snapshots().listen((onData) {
       return onData.documentChanges

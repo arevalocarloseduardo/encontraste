@@ -3,6 +3,9 @@ library painter;
 import 'dart:convert';
 
 import 'package:encontraste/controllers/rtm_controller.dart';
+import 'package:encontraste/models/game_pictonary.dart';
+import 'package:encontraste/models/status_gamer.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' hide Image;
 import 'dart:ui';
 import 'dart:async';
@@ -14,7 +17,8 @@ class Painter extends StatefulWidget {
   final PainterController painterController;
   final bool draw;
   final List<Map<String, double>> map;
-  Painter({this.painterController, this.draw = true, this.map})
+  final StatusGamer status;
+  Painter({this.painterController, this.draw = true, this.map, this.status})
       : super(key: new ValueKey<PainterController>(painterController));
 
   @override
@@ -22,16 +26,18 @@ class Painter extends StatefulWidget {
 }
 
 class _PainterState extends State<Painter> {
-  bool _finished; 
+  bool _finished;
+  List<Map<String, dynamic>> listDataPos = [];
+  RtmController rtm;
+  int limit = 300;
+  int posIndex = 0;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-     
+    rtm = Provider.of<RtmController>(context);
+    rtm.streamMensajes.stream.listen(receiveData);
   }
-  @override
-  void dispose() {
-    super.dispose(); 
-    }
+
   @override
   void initState() {
     super.initState();
@@ -56,81 +62,97 @@ class _PainterState extends State<Painter> {
     child = new ClipRect(child: child);
     if (!_finished && widget.draw) {
       child = new GestureDetector(
-        onTap: () {
-          onMsg(widget.map);
-        },
+        onTap: () {},
         child: child,
         onPanStart: _onPanStart,
-        onPanUpdate: _onPanUpdate,
+        onPanUpdate: posIndex <= limit ? _onPanUpdate : null,
         onPanEnd: _onPanEnd,
       );
     }
-    return new Container(
-      child: child,
-      width: double.infinity,
-      height: double.infinity,
+    return Stack(
+      children: <Widget>[
+        
+        Container(
+          child: child,
+          width: double.infinity,
+          height: double.infinity,
+        ),Container(
+          height: 5,
+          width:  posIndex*MediaQuery.of(context).size.width/limit,
+          color: Colors.red,
+        ),
+      ],
     );
   }
 
-  void entryMao(Map mapa) {
-    mapa = {"d": "s", "sd": "sd"};
-    mapa.map((l, s) {
-      print(l);
-    });
-  }
-
-  onMsg(List<Map<String, double>> data) {
+  onMsg(GamePictonary gameData) {
+    var data = gameData.dataGamePictonary;
+    //List<Map<String, double>> data;
     var first = data.first;
-    var offs = Offset(first["dx"], first["dy"]);
+    var offs = Offset(first.dx, first.dy);
     widget.painterController._pathHistory.add(offs);
     widget.painterController._notifyListeners();
-    print("ava 1");
+
     data.forEach((f) {
-      var pos = Offset(f["dx"], f["dy"]);
+      var pos = Offset(f.dx, f.dy);
       widget.painterController._pathHistory.updateCurrent(pos);
       widget.painterController._notifyListeners();
     });
-    print("ava 3");
     widget.painterController._pathHistory.endCurrent();
     widget.painterController._notifyListeners();
-    /*data.map((l, s) {
-      if (l == "1") {
-        
-        widget.painterController._pathHistory.add(offs);
-      }
-      if (l != "1") {
-        var offs = Offset(double.parse(s["dx"]), double.parse(s["dy"]));
-        widget.painterController._pathHistory.add(offs);
-        widget.painterController._notifyListeners();
-      }
-      if (l == "1") {
-        var offs = Offset(double.parse(s["dx"]), double.parse(s["dy"]));
-        widget.painterController._pathHistory.add(offs);
-        widget.painterController._notifyListeners();
-      }
-    });*/
   }
 
   void _onPanStart(DragStartDetails start) {
     Offset pos = (context.findRenderObject() as RenderBox)
         .globalToLocal(start.globalPosition);
-    var dasd = Offset(pos.dx, pos.dy);
-    widget.painterController._pathHistory.add(dasd);
+    var posSend = Offset(pos.dx, pos.dy);
+    widget.painterController._pathHistory.add(pos);
 
     widget.painterController._notifyListeners();
+    var map = {
+      '"dx"': posSend.dx.toStringAsFixed(2),
+      '"dy"': posSend.dy.toStringAsFixed(2)
+    };
+
+    listDataPos.clear();
+    listDataPos.add(map);
+    setState(() {
+      posIndex = 0;
+    });
   }
 
   void _onPanUpdate(DragUpdateDetails update) {
     Offset pos = (context.findRenderObject() as RenderBox)
         .globalToLocal(update.globalPosition);
+    var posSend = Offset(pos.dx, pos.dy);
     widget.painterController._pathHistory.updateCurrent(pos);
-
     widget.painterController._notifyListeners();
+    var map = {
+      '"dx"': posSend.dx.toStringAsFixed(2),
+      '"dy"': posSend.dy.toStringAsFixed(2)
+    };
+    listDataPos.add(map);
+    setState(() {
+      posIndex++;
+    });
   }
 
   void _onPanEnd(DragEndDetails end) {
     widget.painterController._pathHistory.endCurrent();
     widget.painterController._notifyListeners();
+
+    rtm.enviarMensajeGrupal('"dataGamePictonary":' + listDataPos.toString());
+    setState(() {
+      posIndex = 0;
+    });
+    listDataPos.clear();
+  }
+
+  Future<void> receiveData(String data) async {
+    JsonCodec codec = new JsonCodec();
+    var parsedJson = codec.decode("""$data""");
+    var game = GamePictonary.fromMap(parsedJson);
+    onMsg(game);
   }
 }
 

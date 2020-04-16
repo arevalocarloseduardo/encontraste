@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:agora_rtm/agora_rtm.dart';
+import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/sala.dart';
 import 'package:encontraste/services/database_service.dart';
 import 'package:encontraste/utils/settings.dart';
@@ -6,25 +10,36 @@ import 'package:flutter/cupertino.dart';
 
 import 'auth_controller.dart';
 
+enum VOICES { off, oldman, babyBoy, babyGirl, zhubajie, ethereal, hulk }
+
 class RtmController with ChangeNotifier {
   AuthController _aut;
+  AgoraRtmClient _client;
+  AgoraRtmChannel _channel;
+  StreamController<String> streamMensajes = StreamController.broadcast();
+  DatabaseService _db;
+  Sala isSala;
+  Persona isPersona;
+  final _infoStrings = <String>[];
+
+  bool _isLogin = false;
+  bool get isLogin => _isLogin;
+  set isLogin(bool value) {
+    _isLogin = value;
+    //notifyListeners();
+  }
+
+  bool _isInChannel = false;
+  bool get isInChannel => _isInChannel;
+  set isInChannel(bool value) {
+    _isInChannel = value;
+    //notifyListeners();
+  }
 
   List<AgoraRtmMember> _members;
   List<AgoraRtmMember> get members => _members;
-
   set members(List<AgoraRtmMember> value) {
     _members = value;
-    notifyListeners();
-  }
-
-  DatabaseService _db;
-  final _infoStrings = <String>[];
-
-  AgoraRtmClient _client;
-  AgoraRtmChannel _channel;
-  AgoraRtmChannel get channel => _channel;
-  set channel(AgoraRtmChannel value) {
-    _channel = value;
     notifyListeners();
   }
 
@@ -35,29 +50,66 @@ class RtmController with ChangeNotifier {
     notifyListeners();
   }
 
-  bool _isLogin = false;
-  bool get isLogin => _isLogin;
-  set isLogin(bool value) {
-    _isLogin = value;
+  AgoraRtmChannel get channel => _channel;
+  set channel(AgoraRtmChannel value) {
+    _channel = value;
     notifyListeners();
   }
 
-  bool _isInChannel = false;
-  bool get isInChannel => _isInChannel;
-  set isInChannel(bool value) {
-    _isInChannel = value;
-    notifyListeners();
+  void joinRoom(
+      {bool video = true,
+      bool audio = true,
+      bool mensajes = true,
+      @required Sala sala,
+      @required Persona persona}) async {
+    isSala = sala;
+    isPersona = persona;
+    video ? AgoraRtcEngine.enableVideo() : AgoraRtcEngine.disableVideo();
+    audio ? AgoraRtcEngine.enableAudio() : AgoraRtcEngine.disableAudio();
+    AgoraRtcEngine.setChannelProfile(ChannelProfile.Communication);
+    VideoEncoderConfiguration config = VideoEncoderConfiguration();
+    config.orientationMode = VideoOutputOrientationMode.FixedPortrait;
+    AgoraRtcEngine.setVideoEncoderConfiguration(config);
+
+    AgoraRtcEngine.startPreview();
+    AgoraRtcEngine.joinChannel(null, sala.channelName, null, 0);
+    isInChannel = true;
+
+    if (mensajes) {
+      _client.login(null, _aut.user.uid);
+      _channel = await _client.createChannel(sala.channelName);
+      isLogin = true;
+    }
+    _addChannelRtmEvent();
+    _addChannelRtcEvent();
+    _db.ingreseSala(sala, _aut.user.uid);
+  }
+
+  void leftRoom()  {
+    if (isInChannel) {
+      AgoraRtcEngine.leaveChannel();
+      AgoraRtcEngine.stopPreview();
+      isInChannel = false;
+    }
+    if (isLogin) {
+      _client.logout();
+      isLogin = true;
+    }
+     _db.saliSala(isSala, _aut.user.uid);
   }
 
   RtmController()
       : _db = DatabaseService(),
         _aut = AuthController.shared {
-    _createClient(_aut.user.uid);
+    print("instancia de rtm");
+    init();
   }
-  void _createClient(String uid) async {
+
+  init() async {
+    AgoraRtcEngine.create(APP_ID);
     _client = await AgoraRtmClient.createInstance(APP_ID);
     _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
-      _log("viene msg de: " + peerId + ", msg: " + message.text);
+      _log("Peer msg: " + peerId + ", msg: " + message.text);
     };
     _client.onConnectionStateChanged = (int state, int reason) {
       _log('Connection state changed: ' +
@@ -68,63 +120,41 @@ class RtmController with ChangeNotifier {
         _client.logout();
         _log('Logout.');
         _isLogin = false;
-        notifyListeners();
       }
     };
-    await _client.login(null, uid);
-    print("me loguee en el channel con: $uid");
   }
 
-  enviarMensajePersonal(String id, String msg) async {
-    AgoraRtmMessage message = AgoraRtmMessage.fromText(msg);
-    await _client.sendMessageToPeer(id, message, false);
+  changeVoice(VOICES voice) {
+    switch (voice) {
+      case VOICES.off:
+        AgoraRtcEngine.setLocalVoiceChanger(VoiceChanger.VOICE_CHANGER_OFF);
+        break;
+      case VOICES.babyBoy:
+        AgoraRtcEngine.setLocalVoiceChanger(VoiceChanger.VOICE_CHANGER_BABYBOY);
+        break;
+      case VOICES.babyGirl:
+        AgoraRtcEngine.setLocalVoiceChanger(
+            VoiceChanger.VOICE_CHANGER_BABYGILR);
+        break;
+      case VOICES.ethereal:
+        AgoraRtcEngine.setLocalVoiceChanger(
+            VoiceChanger.VOICE_CHANGER_ETHEREAL);
+        break;
+      case VOICES.hulk:
+        AgoraRtcEngine.setLocalVoiceChanger(VoiceChanger.VOICE_CHANGER_HULK);
+        break;
+      case VOICES.oldman:
+        AgoraRtcEngine.setLocalVoiceChanger(VoiceChanger.VOICE_CHANGER_OLDMAN);
+        break;
+      case VOICES.zhubajie:
+        AgoraRtcEngine.setLocalVoiceChanger(
+            VoiceChanger.VOICE_CHANGER_ZHUBAJIE);
+        break;
+      default:
+    }
   }
 
-  enviarMensajeGrupal(String msg) async {
-    var string = [
-      {"dx": 124.36, "dy": 124.36},
-      {"dx": 126.18, "dy": 126.18},
-      {"dx": 129.82, "dy": 129.82},
-      {"dx": 132.36, "dy": 132.36},
-      {"dx": 138.18, "dy": 138.18},
-      {"dx": 140.36, "dy": 140.36},
-      {"dx": 143.27, "dy": 143.27},
-      {"dx": 145.09, "dy": 145.09},
-      {"dx": 145.82, "dy": 145.82},
-      {"dx": 147.64, "dy": 147.64},
-      {"dx": 148.73, "dy": 148.73},
-      {"dx": 149.45, "dy": 149.45},
-      {"dx": 149.45, "dy": 149.45},
-      {"dx": 149.45, "dy": 149.45},
-      {"dx": 149.45, "dy": 149.45},
-      {"dx": 149.82, "dy": 149.82},
-      {"dx": 150.55, "dy": 150.55}
-    ];
-    AgoraRtmMessage message = AgoraRtmMessage.fromText(string.toString());
-
-    await _channel.sendMessage(message);
-  }
-
-  getIntegrantes() async {
-    members = await _channel.getMembers();
-  }
-
-  salirSala(Sala sala) async {
-    await _channel.leave();
-   // await _client.releaseChannel(_channel.channelId);
-    
-   await _db.saliSala(sala, _aut.user.uid);
-  }
-
-  Future<bool> ingresarSala(Sala sala) async {
-    await _createChannel(sala.channelName);
-     await _channel.join();
-    await _db.ingreseSala(sala, _aut.user.uid);
-    return true;
-  }
-
-  Future<bool> _createChannel(String name) async {
-    _channel = await _client.createChannel(name);
+  Future<bool> _addChannelRtmEvent() async {
     _channel.onMemberJoined = (AgoraRtmMember member) {
       _log(
           "Member joined: " + member.userId + ', channel: ' + member.channelId);
@@ -134,30 +164,75 @@ class RtmController with ChangeNotifier {
     };
     _channel.onMessageReceived =
         (AgoraRtmMessage message, AgoraRtmMember member) {
-      _log("Channel msg: " + member.userId + ", msg: " + message.text);
+      streamMensajes.add("""{"user":"${member.userId}", ${message.text}}""");
     };
     return true;
   }
 
-  mensajeFilter() {
-    var acumulador = [];
-    var lentTemp = 0;
-    var enviar = true;
-    var lentToSend = 32;
-    while (enviar) {
-      var listPointsToSend = [];
-      if (acumulador.length > lentToSend) {
-        for (var i = lentTemp; i < lentTemp + lentToSend; i++) {
-          listPointsToSend.add(acumulador[i]);
-        }
-        lentTemp = lentTemp + lentToSend;
-      } else {
-        for (var i = lentTemp; i < acumulador.length; i++) {
-          listPointsToSend.add(acumulador[i]);
-        }
-        lentTemp = acumulador.length;
-      }
-    }
+  void _addChannelRtcEvent() {
+    AgoraRtcEngine.onVideoSizeChanged = (uid, width, height, rotation) {
+      print('$uid $width $height $rotation');
+    };
+
+    AgoraRtcEngine.onJoinChannelSuccess =
+        (String channel, int uid, int elapsed) {
+      String info = 'onJoinChannel: ' + channel + ', uid: ' + uid.toString();
+      _infoStrings.add(info);
+    };
+
+    AgoraRtcEngine.onLeaveChannel = () {
+      _infoStrings.add('onLeaveChannel');
+    };
+
+    AgoraRtcEngine.onUserJoined = (int uid, int elapsed) {
+      String info = 'userJoined: ' + uid.toString();
+      _infoStrings.add(info);
+    };
+
+    AgoraRtcEngine.onUserOffline = (int uid, int reason) {
+      String info = 'userOffline: ' + uid.toString();
+      _infoStrings.add(info);
+    };
+
+    AgoraRtcEngine.onFirstRemoteVideoFrame =
+        (int uid, int width, int height, int elapsed) {
+      String info = 'firstRemoteVideo: ' +
+          uid.toString() +
+          ' ' +
+          width.toString() +
+          'x' +
+          height.toString();
+      _infoStrings.add(info);
+    };
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    streamMensajes.close();
+  }
+
+  enviarMensajePersonal(String id, String msg) async {
+    AgoraRtmMessage message = AgoraRtmMessage.fromText(msg);
+    await _client.sendMessageToPeer(id, message, false);
+  }
+
+  enviarMensajeGrupal(String msg) async {
+    AgoraRtmMessage message = AgoraRtmMessage.fromText(msg);
+    await _channel.sendMessage(message);
+  }
+
+  getIntegrantes() async {
+    members = await _channel.getMembers();
+  }
+
+  salirSala(Sala sala) async {
+    leftRoom();
+  }
+
+  Future<bool> ingresarSala(Sala sala) async {
+    joinRoom(sala: sala, persona: Persona(id: _aut.user.uid));
+    return true;
   }
 
   void _log(String info) {

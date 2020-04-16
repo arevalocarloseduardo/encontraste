@@ -2,9 +2,13 @@ import 'dart:async';
 
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:encontraste/controllers/global_controller.dart';
 import 'package:encontraste/controllers/rtm_controller.dart';
+import 'package:encontraste/models/persona.dart';
 import 'package:encontraste/models/sala.dart';
 import 'package:encontraste/services/database_service.dart';
+import 'package:encontraste/views/screens/home_page/game_page/sala.dart';
+import 'package:encontraste/views/screens/home_page/game_page/juno/juno_page.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +35,6 @@ class IndexState extends State<SelectSala> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    rtm = Provider.of<RtmController>(context);
-    
-  }
-  @override
   void initState() {
     super.initState();
     salasStream = _db.streamSalasListen().listen(_onPersonChanged);
@@ -50,7 +48,9 @@ class IndexState extends State<SelectSala> {
 
   @override
   Widget build(BuildContext context) {
-     
+    GlobalController state = Provider.of<GlobalController>(context);
+
+    rtm = Provider.of<RtmController>(context);
     return Scaffold(
       body: Center(
         child: Container(
@@ -60,7 +60,7 @@ class IndexState extends State<SelectSala> {
             itemCount: salas.length,
             itemBuilder: (BuildContext context, int index) {
               return InkWell(
-                onTap: () => selectSala(salas[index]),
+                onTap: () => selectSala(salas[index], state.myDataPersona),
                 child: Card(
                     child: ListTile(
                   trailing: Column(
@@ -88,24 +88,64 @@ class IndexState extends State<SelectSala> {
     );
   }
 
-  Future<void> selectSala(Sala sala) async {
+  Future<void> selectSala(Sala sala, Persona myDataPersona) async {
+    await _handleCameraAndMic();
     switch (sala.channelName) {
       case "room_game1":
-        joinGameDraw(sala);
+        joinGameJuno();
         break;
-        case "room_game2":
-        joinGameDraw(sala);
+      case "room_video":
+        joinVideo(sala, myDataPersona);
+        break;
+      case "room_audio":
+        joinAudio(sala, myDataPersona);
         break;
       default:
     }
   }
 
-  Future<void> joinGameDraw(Sala sala) async {
+  Future<void> joinGameJuno( ) async {
+ 
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JunoPage( ),
+      ),
+    );
+  } Future<void> joinGameDraw(Sala sala, Persona persona) async {
+
+
+    rtm.joinRoom(video: false, sala: sala, persona: persona);
+    // await rtm.ingresarSala(sala);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GamePageDemo(sala: sala, persona: persona),
+      ),
+    );
+  }
+
+  Future<void> joinVideo(Sala sala, Persona myDataPersona) async {
     await rtm.ingresarSala(sala);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GamePageDemo(sala:sala),
+        builder: (context) => SalaPage(
+          sala: sala,
+          myDataPersona: myDataPersona,
+        ),
+      ),
+    );
+  }
+
+  Future<void> joinAudio(Sala sala, Persona myDataPersona) async {
+    await rtm.ingresarSala(sala);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SalaPage(),
       ),
     );
   }

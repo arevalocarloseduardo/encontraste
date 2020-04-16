@@ -78,6 +78,7 @@ class AuthController with ChangeNotifier {
     try {
       _status = Status.Authenticating;
       notifyListeners();
+      //en debug n funciona
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;

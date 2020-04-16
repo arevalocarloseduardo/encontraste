@@ -4,7 +4,8 @@ class Constanst {
   
   Constanst._();
 
-  static const String AUDIO = "audio";  
+  static const String AUDIO = "audio"; 
+  static const String ADIVINA = "adivina";  
   static const String JUGADOR="jugador";
   static const String VIDEO = "video";
   static const String SALAS = "salas";  

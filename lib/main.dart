@@ -9,6 +9,7 @@ import 'controllers/rtm_controller.dart';
 import 'controllers/screen_controller.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'views/screens/home_page/game_page/game_controller.dart';
+import 'views/screens/home_page/game_page/juno/juno_controller.dart';
 import 'views/screens/home_page/home_controller.dart';
 import 'views/screens/onboard_team/onboard_controller.dart';
 
@@ -33,6 +34,8 @@ class Encontraste extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => HomeController()),
           ChangeNotifierProvider(create: (_) => AuthController()),
           ChangeNotifierProvider(create: (_) => GameController()),
+          ChangeNotifierProvider(create: (_) => JunoController()),
+          
         ],
         child: MaterialApp(
           builder: (context, child) {
